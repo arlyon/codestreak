@@ -8,7 +8,7 @@ from .models import Streak
 def index(request):
     template = loader.get_template('codestreak/index.html')
     code_streak = Streak.objects.filter(user=request.user).first()
-    code_streak.check_streak()
+    code_streak.notify_streak()
     context = {
         'code_streak': code_streak.streak,
         'good': True,
