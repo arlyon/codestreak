@@ -1,69 +1,60 @@
-{% extends "skeleton.html" %}
 {% load staticfiles %}
 
-{% block css %}
-{{ block.super }}
-    <link href="https://fonts.googleapis.com/css?family=Rubik+Mono+One" rel="stylesheet">
-{% endblock %}
-{% block js %}
-    {{ block.super }}
-    <script src="{% static 'codestreak/countUp.js' %}"></script>
-{% endblock %}
+<link href="https://fonts.googleapis.com/css?family=Rubik+Mono+One" rel="stylesheet">
 
-{% block body %}
+<script src="{% static 'codestreak/countUp.js' %}"></script>
 
-    <style>
-        body {
-            background-color: rgb(255,255,255);
-        }
 
-        h1#output {
-            font-size: 8em;
-            font-family: 'Rubik Mono One', sans-serif;
-            font-weight:400;
-            text-align: center;
-        }
+<style>
+    body {
+        background-color: rgb(255,255,255);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        .Site-content {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-        }
-    </style>
+    h1 {
+        font-family: 'Rubik Mono One', sans-serif;
+        font-weight:400;
+        text-align: center;
+    }
 
-    <div>
-        {% if message %}
-            <h1>{{ message }}</h1>
-        {% else %}
-            <h1>Your Streak:</h1>
-            <h1 id="output">0</h1>
-        {% endif %}
-    </div>
+    h1#output {
+        font-size: 8em;
+    }
+</style>
+
+<div>
+    {% if message %}
+        <h1>{{ message }}</h1>
+    {% else %}
+        <h1>Your Streak:</h1>
+        <h1 id="output">0</h1>
+    {% endif %}
+</div>
 
 
 
 
-    <script>
+<script>
 
-        var options = {
-            useEasing : true,
-            useGrouping : true,
-        };
+    var options = {
+        useEasing : true,
+        useGrouping : true,
+    };
 
-        function playsound() {
-            sound.play();
-        }
+    function playsound() {
+        sound.play();
+    }
 
-        {% if good %}
-            var sound = new Audio("{% static "codestreak/W.mp3" %}");
-            var counter = new CountUp("output", 0, {{ code_streak }}, 0, 3, options);
+    {% if good %}
+        var sound = new Audio("{% static "codestreak/W.mp3" %}");
+        var counter = new CountUp("output", 0, {{ code_streak }}, 0, 3, options);
 
-        {% else %}
-            var sound = new Audio("{% static "codestreak/L.mp3" %}");
-            var counter = new CountUp("output", {{ code_streak }}, 0, 0, 3, options);
-        {% endif %}
-        counter.start(playsound);
+    {% else %}
+        var sound = new Audio("{% static "codestreak/L.mp3" %}");
+        var counter = new CountUp("output", {{ code_streak }}, 0, 0, 3, options);
+    {% endif %}
+    counter.start(playsound);
 
-    </script>
-
-{% endblock %}
+</script>
