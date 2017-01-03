@@ -1,9 +1,9 @@
 {% load staticfiles %}
 
 <link href="https://fonts.googleapis.com/css?family=Rubik+Mono+One" rel="stylesheet">
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script src="{% static 'codestreak/countUp.js' %}"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <style>
     body {
@@ -11,6 +11,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        font-family: 'Rubik Mono One', sans-serif;
+        font-weight:400;
     }
 
     h1 {
@@ -22,19 +24,35 @@
     h1#output {
         font-size: 8em;
     }
+
+    a#quit {
+        position: absolute;
+        top:10px;
+        right:10px;
+        color: #ff8246;
+        text-decoration: none;
+    }
+
+    #toast-container {
+        background-color: white;
+        z-index: 999;
+        position: absolute;
+        top:10px;
+        padding:auto;
+    }
+    .toast-message {
+        text-align: center;
+    }
 </style>
 
 <div>
-    {% if message %}
-        <h1>{{ message }}</h1>
-    {% else %}
-        <h1>Your Streak:</h1>
-        <h1 id="output">0</h1>
-    {% endif %}
+    <h1>Your Streak:</h1>
+    <h1 id="output">0</h1>
+
+    <a id="quit" href="#" onclick="">delete me (forever)</a>
+
+    {% csrf_token %}
 </div>
-
-
-
 
 <script>
 
@@ -47,14 +65,60 @@
         sound.play();
     }
 
-    {% if good %}
+    {% if lost %}
+        var sound = new Audio("{% static "codestreak/Z.mp3" %}");
+        var counter = new CountUp("output", {{ streak }}, 0, 0, 3, options);
+        counter.start();
+        sound.play();
+    {% elif streak != 0 %}
         var sound = new Audio("{% static "codestreak/W.mp3" %}");
-        var counter = new CountUp("output", 0, {{ code_streak }}, 0, 3, options);
-
-    {% else %}
-        var sound = new Audio("{% static "codestreak/L.mp3" %}");
-        var counter = new CountUp("output", {{ code_streak }}, 0, 0, 3, options);
+        var counter = new CountUp("output", 0, {{ streak }}, 0, 3, options);
+        counter.start(playsound);
     {% endif %}
-    counter.start(playsound);
+
+    var d = new Date()
+    var offset = d.getTimezoneOffset();
+
+    var csrf_token = $('input[name="csrfmiddlewaretoken"]').val()
+
+    $.ajax({
+        type: "POST",
+        url: "{% url "codestreak:update_timezone" %}",
+        data: {
+            "csrfmiddlewaretoken": csrf_token,
+            "offset": offset
+        },
+        success: function(data){
+            {% if message %}
+                toastr.info("{{ message }}")
+            {% endif %}
+        },
+        failure: function(data){
+            console.log("error")
+        },
+    });
+
+    var quit = $("#quit")
+
+    quit.click(function(){
+        $.ajax({
+            type: "POST",
+            url: "{% url "codestreak:quit" %}",
+            data: {
+                "csrfmiddlewaretoken": csrf_token
+            },
+            success: function(data){
+                toastr.info("Your data is gone. Didn't like you anyway.")
+                var sound = new Audio("{% static "codestreak/L.mp3" %}");
+                var counter = new CountUp("output", {{ streak }}, 0, 0, 3, options);
+                quit.remove()
+                counter.start()
+                sound.play();
+            },
+            failure: function(data){
+                console.log("Something went wrong.")
+            },
+        })
+    })
 
 </script>
