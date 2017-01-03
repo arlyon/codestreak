@@ -7,7 +7,7 @@
 {% endblock %}
 {% block js %}
     {{ block.super }}
-    <script src="{% static 'littleg/countUp.js' %}"></script>
+    <script src="{% static 'codestreak/countUp.js' %}"></script>
 {% endblock %}
 
 {% block body %}
@@ -45,26 +45,24 @@
 
     <script>
 
-        var easingFn = function (t, b, c, d) {
-            var ts = (t /= d) * t;
-            var tc = ts * t;
-            return b + c * (tc + -3 * ts + 3 * t);
-        }
-
         var options = {
-          useEasing : true,
-          easingFn: easingFn,
-          useGrouping : true,
-          separator : ',',
-          decimal : '.',
+            useEasing : true,
+            useGrouping : true,
         };
 
+        function playsound() {
+            sound.play();
+        }
+
         {% if good %}
+            var sound = new Audio("{% static "codestreak/W.mp3" %}");
             var counter = new CountUp("output", 0, {{ code_streak }}, 0, 3, options);
+
         {% else %}
+            var sound = new Audio("{% static "codestreak/L.mp3" %}");
             var counter = new CountUp("output", {{ code_streak }}, 0, 0, 3, options);
         {% endif %}
-        counter.start();
+        counter.start(playsound);
 
     </script>
 

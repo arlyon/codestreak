@@ -1,20 +1,20 @@
 # Code Streak
 
-Code streak is a simple django app that helps you keep a track of your programming, through github.
-
+Code Streak is a simple django app that helps you keep a track of your commit streak, sending pushbullet
+notifications to keep you on track.
 ## Installation
 
 #### Prerequisites
 * python 3.5 (untested with other versions)
-* django-allauth (0.27.0) for the user's github username (although you can supply that yourself)
-* django itself (1.9.9)
+* django (1.9.9)
 * huey (1.2.2)
 * pushbullet.py (0.10.0)
 * requests (2.12.4)
+* dateutil (2.6.0)
 
 #### Clone
-When you have all of those, drop the app into your project clone the extendless branch (master extends a template). 
-Drop it in your proje ct.
+When you have all of the prerequisites, clone the extend-less branch and drop it into your project.
+Currently the master branch extends a template I use.
 
 #### Configuration
 
@@ -27,26 +27,30 @@ project/project/settings.py:
 project/project/urls.py:
 
     urlpatterns += [
-        url(r'^codestreak/', include('codestreak.urls', namespace="codestreak")),
+        url(r'^codestreak/', include('codestreak.urls'),
     ]
 
-project/settings_local.py: (it is good practice to keep all api keys outside of your git tree. mine are in a file called settings_local)
+project/settings_local.py: (it is good practice to keep all api keys outside of your git tree. mine are in a file called project/settings_local.py)
 
     PUSHBULLET_KEY = "MYKEYHERE"
 
 Specify in `codestreak_acceptedevent` in the database which events you want to count as a success.
+These are checked at 20:00 and 00:00 local time against each users event history.
+
 Events are defined here: [Event Types & Payloads](https://developer.github.com/v3/activity/events/types/)
 
-A good place to start is with `PushEvent`, `PullRequestEvent`, and `CreateEvent`
+A good place to start is accepting `PushEvent`, `PullRequestEvent`, and `CreateEvent`.
 
 
 ## Planned:
 
--[ ] reduce dependencies
+- [ ] reduce dependencies
+- [ ] allauth (and github) integration
 
 ## Usage
 
-Go to /codestreak with a github account attached to your allauth user to register. Start commiting!
+Currently the app assumes that `request.user.username` is the user's github username.
+Go to /codestreak to register. Start commiting!
 
 ## Contributing
 

@@ -10,7 +10,7 @@ def index(request):
     code_streak = Streak.objects.filter(user=request.user).first()
     context = {
         'code_streak': code_streak.streak,
-        'good': True,
+        'good': True if code_streak.streak is not 0 else False,
     }
     if code_streak is None:
         if request.user.socialaccount_set.github is not None:
