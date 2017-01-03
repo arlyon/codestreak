@@ -21,7 +21,7 @@ class Streak(models.Model):
         """Updates the streak. Run by huey at midnight."""
         GITHUB_API = "https://api.github.com/users/{0}/events".format(self.user.username)
 
-        accepted_events = AcceptedEvent.objects.values_list("name")
+        accepted_events = AcceptedEvent.objects.values_list("name", flat=True)
         events = json.loads(requests.get(GITHUB_API).text)
         for event in events:
             # it needs to be either a commit or a pull request
