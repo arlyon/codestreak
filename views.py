@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
-from .models import Streak
-
-# Create your views here.
+from .models import Streak, Session, Language
+from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
     template = loader.get_template('codestreak/index.html')
@@ -59,3 +59,34 @@ def quit(request):
         Streak.objects.filter(user=request.user).delete()
         return JsonResponse({'message': 'success'})
     return JsonResponse({'message': 'fail'})
+
+
+@csrf_exempt
+def submit_session(request):
+    if request.method == "POST":
+        user = Streak.objects.filter(uuid=request.POST.get("uuid")).first()
+        if user:
+            try:
+                start = datetime.fromtimestamp(float(request.POST.get("start")))
+                end =  datetime.fromtimestamp(float(request.POST.get("end")))
+                language = Language.objects.filter(name=request.POST.get("language")).first()
+
+                s = Session(start=start, end=end, language=language)
+                s.save()
+                user.sessions.add(s)
+                return JsonResponse({"status": "success",
+                                     "data": None,
+                                     "message": "Added session."})
+            except:
+                return JsonResponse({"status": "error",
+                                     "data": None,
+                                     "message": "Could not save session."})
+
+        else:
+            return JsonResponse({"status": "error",
+                                 "data": None,
+                                 "message": "Wrong UUID."})
+    else:
+        return JsonResponse({"status": "error",
+                             "data": None,
+                             "message": "Request was not a POST."})

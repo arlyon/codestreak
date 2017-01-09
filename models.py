@@ -7,24 +7,41 @@ import dateutil.parser
 from pushbullet import PushBullet
 from settings_local import PUSHBULLET_KEY, GITLAB_KEY, GITLAB_URL
 import html5lib
+from django.utils.crypto import get_random_string
 
 # Create your models here.
+
 
 class AcceptedEvent(models.Model):
     name = models.TextField()
 
+
+class Language(models.Model):
+    name = models.TextField()
+
+
+class Session(models.Model):
+    start = models.DateTimeField(default=datetime.now())
+    end = models.DateTimeField()
+    language = models.ForeignKey(Language)
+
+
 class Streak(models.Model):
+    uuid = models.TextField(default=get_random_string(length=32), max_length=32, primary_key=True)
     user = models.ForeignKey(User)
     streak = models.IntegerField(default=0)
     date = models.DateTimeField(default=datetime.now())
     utc_offset = models.IntegerField(default=0)
     lost = models.BooleanField(default=False)
+    sessions = models.ManyToManyField(Session)
 
     def update_streak(self, test_for_success=False):
         """Updates the streak. Run by huey at midnight. True means streak is incremented, false means failure.
 
         Attribute:
             test_for_success: when true the result is simulated but not saved."""
+
+        pb = PushBullet(PUSHBULLET_KEY)
 
         def github():
             """Checks if a commit has been made in the last 24 hours."""
@@ -49,9 +66,9 @@ class Streak(models.Model):
             try:
                 CODECAMP_URL = "https://www.freecodecamp.com/{0}".format(self.user.username)
                 document = html5lib.parse(requests.get(CODECAMP_URL).text)
-                if document.findtext(datetime.now().strftime("%b %d, %Y"), default=None) is not None:
-                    return True
-                return False
+                if document.findtext((datetime.now()-timedelta(days=1)).strftime("%b %d, %Y"), default=None) is None:
+                    return False
+                return True
             except:
                 return False
 
@@ -83,26 +100,31 @@ class Streak(models.Model):
             except:
                 return False
 
-        successful = gitlab() or github() or freecodecamp()
+        def session():
+            date_from = datetime.now() - timedelta(days=1)
+
+            if self.sessions.objects.filter(start__gte=date_from):
+                return True
+
+            return False
+
+        successful = gitlab() or github() or freecodecamp() or session()
 
         if test_for_success is False:
             self.streak += (1*int(successful)*int(self.lost))  # stops you getting more points after losing.
             self.lost = not successful or self.lost  # if you lost, it will stay until you open the app.
             self.date = datetime.now()
+            if self.lost:
+                push = pb.push_link("www.hattiechocolateday.com/codestreak", "Your streak is over! Visit the app to reset.")
             self.save()
+        else:
+            if successful:
+                push = pb.push_note("Well done. You made a commit today.", ":)")
+            else:
+                push = pb.push_note("You're risking your streak!", "It's quite late and you still haven't made a commit. Hurry!")
 
-        return True if successful else None if successful is None else False
-
+        return True if successful else False
 
     def notify_streak(self):
-        pb = PushBullet(PUSHBULLET_KEY)
-        successful = self.update_streak(test_for_success=True)
-        if successful is None:
-            push = pb.push_link("Your streak is over!",
-                                "http://127.0.0.1:8000/codestreak/")
-        elif successful:
-            push = pb.push_note("Well done. You made a commit today.",
-                                ":)")
-        elif not successful:
-            push = pb.push_note("You're risking your streak!",
-                                "It's quite late and you still haven't made a commit. Hurry!")
+        self.update_streak(test_for_success=True)
+
