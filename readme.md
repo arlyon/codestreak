@@ -13,8 +13,8 @@ notifications to keep you on track.
 * dateutil (2.6.0)
 
 #### Clone
-When you have all of the prerequisites, clone the extend-less branch and drop it into your project.
-Currently the master branch extends a template I use.
+
+Simply clone the project into your django folder and add the app to your settings, shown below.
 
 #### Configuration
 
@@ -54,7 +54,7 @@ Go to /codestreak to register. Start commiting!
 
 ## Contributing
 
-This was made as an hour code challenge. It is currently hosted [here](www.hattiechocolateday.com/codestreak).
+This was made as an hour code challenge. It is currently hosted [here](www.arlyon.co/codestreak).
 It is feature sparse by design. It's not even designed to work with timezones. If you want to add a feature:
 
 1. Fork it!

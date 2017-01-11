@@ -8,6 +8,7 @@ from pushbullet import PushBullet
 from settings_local import PUSHBULLET_KEY, GITLAB_KEY, GITLAB_URL
 import html5lib
 from django.utils.crypto import get_random_string
+from django.core import urlresolvers
 
 # Create your models here.
 
@@ -115,7 +116,7 @@ class Streak(models.Model):
             self.lost = not successful or self.lost  # if you lost, it will stay until you open the app.
             self.date = datetime.now()
             if self.lost:
-                push = pb.push_link("www.hattiechocolateday.com/codestreak", "Your streak is over! Visit the app to reset.")
+                push = pb.push_link(urlresolvers.resolve("codestreak:root"), "Your streak is over! Visit the app to reset.")
             self.save()
         else:
             if successful:
