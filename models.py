@@ -22,7 +22,7 @@ class Language(models.Model):
 
 
 class Session(models.Model):
-    start = models.DateTimeField(default=datetime.now())
+    start = models.DateTimeField()
     end = models.DateTimeField()
     language = models.ForeignKey(Language)
 
