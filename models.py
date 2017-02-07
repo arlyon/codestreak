@@ -28,7 +28,7 @@ class Session(models.Model):
 
 
 class Streak(models.Model):
-    uuid = models.CharField(default=get_random_string(length=10), max_length=10, primary_key=True)
+    uuid = models.CharField(max_length=10, primary_key=True)
     user = models.ForeignKey(User)
     streak = models.PositiveIntegerField(default=0)
     date = models.DateTimeField()
