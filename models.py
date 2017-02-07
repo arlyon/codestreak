@@ -28,11 +28,11 @@ class Session(models.Model):
 
 
 class Streak(models.Model):
-    uuid = models.TextField(default=get_random_string(length=32), max_length=32, primary_key=True)
+    uuid = models.CharField(default=get_random_string(length=10), max_length=10, primary_key=True)
     user = models.ForeignKey(User)
-    streak = models.IntegerField(default=0)
-    date = models.DateTimeField(default=datetime.now())
-    utc_offset = models.IntegerField(default=0)
+    streak = models.PositiveIntegerField(default=0)
+    date = models.DateTimeField()
+    utc_offset = models.PositiveIntegerField(default=0)
     lost = models.BooleanField(default=False)
     sessions = models.ManyToManyField(Session)
 
