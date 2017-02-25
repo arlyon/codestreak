@@ -34,7 +34,7 @@ def index(request):
             code_streak.lost = False
             code_streak.save()
     else:
-        s = Streak(user=request.user)
+        s = Streak(user=request.user, date=datetime.now())
         s.save()
         context["message"] = "I hope this will keep you motivated."
         context["streak"] = 0

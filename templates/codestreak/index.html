@@ -76,10 +76,10 @@
         counter.start(playsound);
     {% endif %}
 
-    var d = new Date()
+    var d = new Date();
     var offset = d.getTimezoneOffset();
 
-    var csrf_token = $('input[name="csrfmiddlewaretoken"]').val()
+    var csrf_token = $('input[name="csrfmiddlewaretoken"]').val();
 
     $.ajax({
         type: "POST",
@@ -90,7 +90,7 @@
         },
         success: function(data){
             {% if message %}
-                toastr.info("{{ message }}")
+                toastr.info("{{ message }}");
             {% endif %}
         },
         failure: function(data){
@@ -98,7 +98,7 @@
         },
     });
 
-    var quit = $("#quit")
+    var quit = $("#quit");
 
     quit.click(function(){
         $.ajax({
@@ -108,11 +108,11 @@
                 "csrfmiddlewaretoken": csrf_token
             },
             success: function(data){
-                toastr.info("Your data is gone. Didn't like you anyway.")
+                toastr.info("Your data is gone. Didn't like you anyway.");
                 var sound = new Audio("{% static "codestreak/L.mp3" %}");
                 var counter = new CountUp("output", {{ streak }}, 0, 0, 3, options);
-                quit.remove()
-                counter.start()
+                quit.remove();
+                counter.start();
                 sound.play();
             },
             failure: function(data){
