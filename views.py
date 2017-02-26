@@ -69,7 +69,7 @@ def submit_session(request):
         if user:
             try:
                 start = datetime.fromtimestamp(float(request.POST.get("start")))
-                end =  datetime.fromtimestamp(float(request.POST.get("end")))
+                end = datetime.fromtimestamp(float(request.POST.get("end")))
                 language = Language.objects.filter(name=request.POST.get("language")).first()
 
                 s = Session(start=start, end=end, language=language)
@@ -78,10 +78,10 @@ def submit_session(request):
                 return JsonResponse({"status": "success",
                                      "data": None,
                                      "message": "Added session."})
-            except:
+            except Exception as e:
                 return JsonResponse({"status": "error",
                                      "data": None,
-                                     "message": "Could not save session."})
+                                     "message": e})
 
         else:
             return JsonResponse({"status": "error",
