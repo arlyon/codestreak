@@ -4,6 +4,7 @@ from django.template import loader
 from .models import Streak, Session, Language
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
+import uuid
 
 def index(request):
     template = loader.get_template('codestreak/index.html')
@@ -34,7 +35,7 @@ def index(request):
             code_streak.lost = False
             code_streak.save()
     else:
-        s = Streak(user=request.user, date=datetime.now())
+        s = Streak(user=request.user, date=datetime.now(), uuid=uuid.uuid4())
         s.save()
         context["message"] = "I hope this will keep you motivated."
         context["streak"] = 0
